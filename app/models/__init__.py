@@ -7,4 +7,5 @@ from .task import AnalysisTask, TaskStatus
 import os
 if os.getenv('CREATE_TABLES', 'false').lower() == 'true':
     Base.metadata.create_all(bind=engine)
+    
 __all__ = ["Base", "User", "AnalysisTask", "TaskStatus", "get_db"]

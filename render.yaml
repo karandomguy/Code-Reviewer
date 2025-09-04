@@ -47,6 +47,7 @@ services:
     scaling:
       minInstances: 1
       maxInstances: 3
+      targetCPUPercent: 70
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -100,9 +101,9 @@ services:
     name: code-review-redis
     maxmemoryPolicy: allkeys-lru
     plan: starter
+    ipAllowList: []
 
 databases:
   - name: code-review-db
     databaseName: code_review_db
-    user: postgres
     plan: starter
