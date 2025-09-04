@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: code-review-api
+    runtime: python
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --host 0.0.0.0 --port $PORT --timeout 120"
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: code-review-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: code-review-redis
+          type: redis
+          property: connectionString
+      - key: REDIS_RESULTS_URL
+        fromService:
+          name: code-review-redis
+          type: redis
+          property: connectionString
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GITHUB_OAUTH_REDIRECT_URI
+        value: https://code-review-api.onrender.com/auth/callback
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENABLE_METRICS
+        value: true
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+
+  - type: worker
+    name: code-review-worker
+    runtime: python
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "celery -A app.tasks.analysis_tasks worker --loglevel=info --concurrency=4 --max-tasks-per-child=1000"
+    plan: starter
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: code-review-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: code-review-redis
+          type: redis
+          property: connectionString
+      - key: REDIS_RESULTS_URL
+        fromService:
+          name: code-review-redis
+          type: redis
+          property: connectionString
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+
+  - type: worker
+    name: code-review-scheduler
+    runtime: python
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "celery -A app.tasks.analysis_tasks beat --loglevel=info"
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: code-review-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: code-review-redis
+          type: redis
+          property: connectionString
+      - key: SECRET_KEY
+        sync: false
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+
+  - type: redis
+    name: code-review-redis
+    maxmemoryPolicy: allkeys-lru
+    plan: starter
+
+databases:
+  - name: code-review-db
+    databaseName: code_review_db
+    user: postgres
+    plan: starter
