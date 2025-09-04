@@ -25,8 +25,29 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created")
     
-    # Start metrics server
-    start_metrics_server()
+    # Only start metrics server on first worker to avoid port conflicts
+    import os
+    import multiprocessing
+    
+    # Check if we're the first worker or running in single-process mode
+    current_process = multiprocessing.current_process()
+    worker_id = os.getenv('GUNICORN_WORKER_ID')
+    
+    # Start metrics only on main process or first worker
+    should_start_metrics = (
+        current_process.name == 'MainProcess' or 
+        worker_id is None or 
+        worker_id == '1'
+    )
+    
+    if should_start_metrics:
+        try:
+            start_metrics_server()
+            logger.info("Metrics server started on primary worker")
+        except Exception as e:
+            logger.warning(f"Could not start metrics server: {e}")
+    else:
+        logger.info(f"Skipping metrics server on worker process {worker_id}")
     
     yield
     
