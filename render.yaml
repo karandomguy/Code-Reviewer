@@ -3,7 +3,7 @@ services:
     name: code-review-api
     runtime: python
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
-    startCommand: "gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --host 0.0.0.0 --port $PORT --timeout 120"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4"
     plan: starter
     healthCheckPath: /health
     envVars:
