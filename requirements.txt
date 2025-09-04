@@ -10,6 +10,7 @@ docutils==0.20
 fastapi==0.116.1
 filelock==3.19.1
 groq==0.31.0
+gunicorn==21.0.0
 h2==4.3.0
 httpx==0.28.1
 ipython==8.12.3
