@@ -2,8 +2,6 @@
 
 An intelligent GitHub pull request analysis system that provides comprehensive code reviews using large language models. Built with FastAPI, Celery, and LangGraph for production deployment.
 
-![Live Demo](https://code-review-api-production.up.railway.app)
-
 ## Features
 
 - **Multi-Agent AI Analysis**: Security, performance, style, and logic review specialists
