@@ -2,6 +2,8 @@
 
 An intelligent GitHub pull request analysis system that provides comprehensive code reviews using large language models. Built with FastAPI, Celery, and LangGraph for production deployment.
 
+![Live Demo](https://code-review-api-production.up.railway.app)
+
 ## Features
 
 - **Multi-Agent AI Analysis**: Security, performance, style, and logic review specialists
@@ -57,7 +59,7 @@ celery -A app.tasks.analysis_tasks worker  # Terminal 2: Worker
 ### Docker Development
 
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 ## API Usage
@@ -230,7 +232,7 @@ curl -X POST "https://code-review-api-production.up.railway.app/api/v1/analyze-p
 
 ```bash
 # For local testing, start dependencies
-docker compose -f docker-compose.test.yml up -d redis postgres
+docker-compose -f docker-compose.test.yml up -d redis postgres
 
 # Run tests against local environment
 TEST_DATABASE_URL=postgresql://test:test@localhost:5433/test_db pytest
@@ -239,6 +241,7 @@ TEST_DATABASE_URL=postgresql://test:test@localhost:5433/test_db pytest
 ## Future Improvements
 
 **Near Term**
+- **Enhanced line number detection**: Improve AI agents' ability to map issues to specific line numbers in code
 - Enhanced prompt engineering based on usage feedback
 - WebSocket real-time progress updates
 - Configuration file support (ESLint, Prettier, etc.)
