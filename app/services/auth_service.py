@@ -1,11 +1,13 @@
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-from app.models import User
 from app.utils.logging import logger
+
+if TYPE_CHECKING:
+    from app.models import User
 
 # Load environment variables
 load_dotenv()
@@ -43,8 +45,10 @@ class AuthService:
             logger.error("Token verification failed", error=str(e))
             return None
     
-    def get_current_user(self, db: Session, token: str) -> Optional[User]:
+    def get_current_user(self, db: Session, token: str) -> Optional["User"]:
         """Get current user from token."""
+        from app.models import User
+        
         payload = self.verify_token(token)
         if not payload:
             return None
